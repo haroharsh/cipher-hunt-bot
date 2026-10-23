@@ -1,0 +1,13 @@
+{
+  "teams": [
+    { "name": "Naam m kya rkha h", "roleId": "", "userIds": [] },
+    { "name": "Inovexa", "roleId": "", "userIds": [] },
+    { "name": "Crazy crew", "roleId": "", "userIds": [] },
+    { "name": "Mast orbitors", "roleId": "", "userIds": [] },
+    { "name": "Oops", "roleId": "", "userIds": [] },
+    { "name": "Minty jamuns", "roleId": "", "userIds": [] },
+    { "name": "The Decoders Triad", "roleId": "", "userIds": [] },
+    { "name": "Hidden hunters", "roleId": "", "userIds": [] },
+    { "name": "test", "roleId": "", "userIds": [] }
+  ]
+}

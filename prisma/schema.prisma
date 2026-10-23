@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EventStatus {
+  INACTIVE
+  ACTIVE
+  PAUSED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum QState {
+  AVAILABLE
+  ACTIVE
+  SOLVED
+  PASSED
+  FORFEITED
+}
+
+enum LedgerType {
+  INIT
+  CORRECT_ANSWER
+  WRONG_ANSWER
+  PASS
+  PASS_BONUS
+  ADMIN_ADJUST
+}
+
+// Single-row table (id = 1)
+model Event {
+  id                   Int         @id @default(1)
+  status               EventStatus @default(INACTIVE)
+  scoreFloor           Int?
+  autoAssignNext       Boolean     @default(false)
+  leaderboardChannelId String?
+  leaderboardMessageId String?
+  updatedAt            DateTime    @updatedAt
+}
+
+model Team {
+  id        Int            @id @default(autoincrement())
+  name      String         @unique
+  roleId    String?
+  score     Int            @default(0)
+  members   TeamMember[]
+  questions TeamQuestion[]
+  attempts  Attempt[]
+  ledger    Ledger[]
+}
+
+model TeamMember {
+  discordUserId String @id
+  teamId        Int
+  team          Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
+model Question {
+  id         String         @id
+  imageRef   String
+  difficulty Difficulty
+  answers    String[]
+  active     Boolean        @default(true)
+  teamStates TeamQuestion[]
+}
+
+model TeamQuestion {
+  teamId     Int
+  questionId String
+  state      QState   @default(AVAILABLE)
+  updatedAt  DateTime @updatedAt
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, questionId])
+  @@index([teamId, state])
+}
+
+model Attempt {
+  id         Int      @id @default(autoincrement())
+  teamId     Int
+  questionId String
+  userId     String
+  submitted  String
+  correct    Boolean
+  messageId  String   @unique
+  createdAt  DateTime @default(now())
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
+model Ledger {
+  id         Int        @id @default(autoincrement())
+  teamId     Int
+  type       LedgerType
+  delta      Int
+  questionId String?
+  actorId    String?
+  commandId  String
+  note       String?
+  createdAt  DateTime   @default(now())
+  team       Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  // Guards against a retried/duplicated command awarding points twice
+  @@unique([commandId, teamId, type])
+}

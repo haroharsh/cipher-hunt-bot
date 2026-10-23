@@ -1,0 +1,15 @@
+[Unit]
+Description=Discord Cipher Hunt Bot
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=harshit
+WorkingDirectory=/home/harshit/Downloads/cipher-hunt-bot
+EnvironmentFile=/home/harshit/Downloads/cipher-hunt-bot/.env
+ExecStart=/usr/bin/node /home/harshit/Downloads/cipher-hunt-bot/dist/index.js
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
